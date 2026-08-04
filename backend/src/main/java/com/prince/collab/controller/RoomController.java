@@ -2,7 +2,9 @@ package com.prince.collab.controller;
 
 import com.prince.collab.dto.RoomCreateRequest;
 import com.prince.collab.dto.RoomResponse;
+import com.prince.collab.dto.SnapshotResponse;
 import com.prince.collab.entity.Room;
+import com.prince.collab.service.DocumentSnapshotService;
 import com.prince.collab.service.RoomService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ import java.util.UUID;
 public class RoomController {
 
     private final RoomService roomService;
+    private final DocumentSnapshotService snapshotService;
 
     @PostMapping
     public ResponseEntity<RoomResponse> createRoom(
@@ -39,5 +42,23 @@ public class RoomController {
     public ResponseEntity<RoomResponse> getRoom(@PathVariable UUID roomId) {
         Room room = roomService.getRoom(roomId);
         return ResponseEntity.ok(RoomResponse.from(room));
+    }
+
+    @PutMapping("/{roomId}/snapshot")
+    public ResponseEntity<Void> saveSnapshot(
+            @PathVariable UUID roomId,
+            @RequestBody byte[] content) {
+
+        long version = snapshotService.save(roomId, content);
+        return ResponseEntity.noContent()
+                .header("X-Snapshot-Version", String.valueOf(version))
+                .build();
+    }
+
+    @GetMapping("/{roomId}/snapshot")
+    public ResponseEntity<SnapshotResponse> getSnapshot(@PathVariable UUID roomId) {
+        return snapshotService.find(roomId)
+                .map(snapshot -> ResponseEntity.ok(SnapshotResponse.from(snapshot)))
+                .orElseGet(() -> ResponseEntity.noContent().build());
     }
 }
