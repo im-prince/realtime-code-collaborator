@@ -20,7 +20,7 @@ public class DocumentSnapshot {
     @JoinColumn(name = "room_id", nullable = false, unique = true)
     private Room room;
 
-    @Lob
+
     @Column(columnDefinition = "BYTEA")
     private byte[] content;
 
