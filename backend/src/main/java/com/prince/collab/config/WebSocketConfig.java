@@ -1,5 +1,6 @@
 package com.prince.collab.config;
 
+import com.prince.collab.service.RoomParticipantService;
 import com.prince.collab.websocket.CollabWebSocketHandler;
 import com.prince.collab.websocket.RoomRegistry;
 import lombok.RequiredArgsConstructor;
@@ -14,10 +15,11 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 public class WebSocketConfig implements WebSocketConfigurer {
 
     private final RoomRegistry roomRegistry;
+    private final RoomParticipantService participantService;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new CollabWebSocketHandler(roomRegistry), "/ws/*")
+        registry.addHandler(new CollabWebSocketHandler(roomRegistry, participantService), "/ws/*")
                 .setAllowedOrigins("*");
     }
 }
