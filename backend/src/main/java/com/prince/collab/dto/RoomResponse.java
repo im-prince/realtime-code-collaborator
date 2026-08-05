@@ -10,7 +10,9 @@ public record RoomResponse(
         String name,
         String language,
         Instant createdAt,
-        boolean isActive
+        boolean isActive,
+        boolean guestsCanEdit,
+        Instant lastActiveAt
 ) {
     public static RoomResponse from(Room room) {
         return new RoomResponse(
@@ -18,7 +20,9 @@ public record RoomResponse(
                 room.getName(),
                 room.getLanguage(),
                 room.getCreatedAt(),
-                room.isActive()
+                room.isActive(),
+                room.isGuestsCanEdit(),
+                room.getLastActiveAt()
         );
     }
 }

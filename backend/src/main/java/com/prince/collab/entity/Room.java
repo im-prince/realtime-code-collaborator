@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -35,4 +37,13 @@ public class Room {
 
     @Column(name = "is_active")
     private boolean isActive = true;
+
+    @Column(name = "guests_can_edit", nullable = false)
+    private boolean guestsCanEdit = true;
+
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RoomParticipant> participants = new ArrayList<>();
+
+    @OneToOne(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    private DocumentSnapshot snapshot;
 }

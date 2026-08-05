@@ -63,4 +63,9 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleNoResource(NoResourceFoundException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, "Resource not found");
     }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ProblemDetail handleForbidden(AccessDeniedException ex) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.getMessage());
+    }
 }

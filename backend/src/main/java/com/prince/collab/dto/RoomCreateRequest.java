@@ -10,5 +10,7 @@ public record RoomCreateRequest(
         String name,
 
         @Size(max = 30, message = "Language must be at most 30 characters")
-        String language
+        String language,
+
+        Boolean guestsCanEdit
 ) {}
