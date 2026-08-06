@@ -46,7 +46,7 @@ public class RoomController {
                 .buildAndExpand(room.getId())
                 .toUri();
 
-        return ResponseEntity.created(location).body(RoomResponse.from(room));
+        return ResponseEntity.created(location).body(RoomResponse.from(room,creatorId));
     }
 
     @DeleteMapping("/{roomId}")
@@ -67,16 +67,22 @@ public class RoomController {
                 JwtAuthenticationFilter.USER_ID_ATTRIBUTE);
 
         List<RoomResponse> rooms = roomService.getRoomsCreatedBy(requesterId).stream()
-                .map(RoomResponse::from)
+                .map(room -> RoomResponse.from(room, requesterId))
                 .toList();
 
         return ResponseEntity.ok(rooms);
     }
 
     @GetMapping("/{roomId}")
-    public ResponseEntity<RoomResponse> getRoom(@PathVariable UUID roomId) {
+    public ResponseEntity<RoomResponse> getRoom(
+            @PathVariable UUID roomId,
+            HttpServletRequest request) {
+
+        Long requesterId = (Long) request.getAttribute(
+                JwtAuthenticationFilter.USER_ID_ATTRIBUTE);
+
         Room room = roomService.getRoom(roomId);
-        return ResponseEntity.ok(RoomResponse.from(room));
+        return ResponseEntity.ok(RoomResponse.from(room, requesterId));
     }
 
     @PutMapping("/{roomId}/snapshot")
