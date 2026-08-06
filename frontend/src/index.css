@@ -1,0 +1,202 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Figtree', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+:root,
+[data-theme="dark"] {
+  --bg:      #0B0C0E;
+  --bg2:     #121316;
+  --panel:   rgba(255,255,255,.045);
+  --solid:   #16181C;
+  --solid2:  #1C1F24;
+  --border:  rgba(255,255,255,.09);
+  --border2: rgba(255,255,255,.16);
+  --tx:      #EDEEF0;
+  --tx2:     #A0A4AB;
+  --tx3:     #6B7078;
+  --accent:  #F5A524;
+  --accent2: #FFC978;
+  --accentInk: #1A1206;
+  --glow:    rgba(245,165,36,.32);
+  --shadow:   0 40px 80px -28px rgba(0,0,0,.8), 0 8px 24px -12px rgba(0,0,0,.6);
+  --shadowSm: 0 12px 28px -14px rgba(0,0,0,.7);
+  --ed:      #0E1013;
+  --gut:     #484E57;
+  --lineHl:  rgba(255,255,255,.035);
+  --sky:  radial-gradient(120% 90% at 50% -10%, #1A1C22 0%, #0B0C0E 60%);
+  --grid: rgba(255,255,255,.05);
+
+  --sxkw:  #C792EA;
+  --sxfn:  #82AAFF;
+  --sxstr: #C3E88D;
+  --sxnum: #F78C6C;
+  --sxcom: #5A6270;
+  --sxop:  #89DDFF;
+}
+
+[data-theme="light"] {
+  --bg:      #F5F5F2;
+  --bg2:     #FFFFFF;
+  --panel:   rgba(255,255,255,.72);
+  --solid:   #FFFFFF;
+  --solid2:  #FAFAF8;
+  --border:  rgba(16,18,22,.10);
+  --border2: rgba(16,18,22,.20);
+  --tx:      #16181C;
+  --tx2:     #5B6068;
+  --tx3:     #8A9099;
+  --accent:  #C2740A;
+  --accent2: #E9A13B;
+  --accentInk: #FFFFFF;
+  --glow:    rgba(217,119,6,.22);
+  --shadow:   0 36px 70px -26px rgba(40,32,14,.26), 0 6px 18px -10px rgba(40,32,14,.14);
+  --shadowSm: 0 10px 24px -12px rgba(40,32,14,.18);
+  --ed:      #FFFFFF;
+  --gut:     #AFB4BB;
+  --lineHl:  rgba(16,18,22,.035);
+  --sky:  radial-gradient(120% 90% at 50% -10%, #FFFFFF 0%, #EFEFEA 65%);
+  --grid: rgba(16,18,22,.05);
+
+  --sxkw:  #8250DF;
+  --sxfn:  #1F6FEB;
+  --sxstr: #0A7C42;
+  --sxnum: #B45309;
+  --sxcom: #9AA0A8;
+  --sxop:  #0E7490;
+}
+
+:root {
+  --cursor1: #22D3EE;
+  --cursor2: #F472B6;
+  --cursor3: #A3E635;
+  --cursor4: #FBBF24;
+  --cursor5: #A78BFA;
+  --cursor6: #FB7185;
+
+  --danger:     #FB7185;
+  --dangerLine: rgba(244,63,94,.35);
+  --dangerFill: rgba(244,63,94,.12);
+}
+
+[data-theme="dark"] {
+  --ok:     #34D399;
+  --okFill: rgba(52,211,153,.12);
+}
+
+[data-theme="light"] {
+  --ok:     #047857;
+  --okFill: rgba(5,150,105,.10);
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--tx);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+h1, h2, h3 {
+  text-wrap: balance;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+
+@keyframes flt {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50%      { transform: translate3d(0, -14px, 0); }
+}
+
+@keyframes flt2 {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50%      { transform: translate3d(0, -22px, 0); }
+}
+
+@keyframes flt3 {
+  0%, 100% { transform: translate3d(0, 6px, 0); }
+  50%      { transform: translate3d(0, -10px, 0); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: .5; transform: scale(1); }
+  50%      { opacity: .9; transform: scale(1.06); }
+}
+
+@keyframes trail {
+  0%   { background-position: 0% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes blink {
+  0%, 45%   { opacity: 1; }
+  55%, 100% { opacity: .15; }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -320px 0; }
+  100% { background-position: 320px 0; }
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translate(-50%, -12px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@keyframes sweep {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(400%); }
+}
+
+.shimmer {
+  background: var(--border);
+  background-image: var(--sky);
+  background-attachment: fixed;
+  background-image: linear-gradient(90deg, transparent, var(--border2), transparent);
+  background-size: 320px 100%;
+  background-repeat: no-repeat;
+  animation: shimmer 1.5s linear infinite;
+}
+
+
+.glass {
+  background: color-mix(in oklab, var(--solid) 82%, transparent);
+  border: 1px solid var(--border2);
+  border-radius: 16px;
+  box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.14);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+
+.blob {
+  position: absolute;
+  width: 340px;
+  height: 340px;
+  border-radius: 50%;
+  --blobTint: var(--glow);
+  background: radial-gradient(circle, var(--glow), transparent 68%);
+  filter: blur(18px);
+  pointer-events: none;
+  animation: pulseGlow 7s ease-in-out infinite;
+}
+
+.grid-bg {
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 64px 64px;
+  -webkit-mask-image: radial-gradient(80% 60% at 50% 20%, #000, transparent);
+  mask-image: radial-gradient(80% 60% at 50% 20%, #000, transparent);
+}
