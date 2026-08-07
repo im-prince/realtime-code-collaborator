@@ -1,12 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
+import { useTheme } from '../lib/useTheme.js';
+import { registerThemes } from '../lib/editorTheme.js';
 import { getRoom, shortId } from '../lib/api.js';
 import ThemeToggle from '../components/ThemeToggle.jsx';
 
 export default function EditorRoom() {
   const { roomId } = useParams();
   const navigate = useNavigate();
+  const theme = useTheme();
+  const editor = useRef(null);
+  const monaco = useRef(null);
 
   const [room, setRoom] = useState(null);
   const [copied, setCopied] = useState(false);
@@ -22,6 +27,19 @@ export default function EditorRoom() {
     setCopied(true);
     setTimeout(() => setCopied(false), 1600);
   }
+
+  function onEditorReady(instance, monacoApi) {
+    editor.current = instance;
+    monaco.current = monacoApi;
+
+    registerThemes(monacoApi);
+    monacoApi.editor.setTheme(theme === 'light' ? 'collab-light' : 'collab-dark');
+  }
+
+  useEffect(() => {
+    if (!monaco.current) return;
+    monaco.current.editor.setTheme(theme === 'light' ? 'collab-light' : 'collab-dark');
+  }, [theme]);
 
   if (!room) {
     return <div className="h-screen" style={{ background: 'var(--ed)' }} />;
@@ -60,7 +78,7 @@ export default function EditorRoom() {
         <Editor
           height="100%"
           language={room.language}
-          theme={document.documentElement.dataset.theme === 'light' ? 'light' : 'vs-dark'}
+          onMount={onEditorReady}
           options={{
             fontFamily: 'JetBrains Mono',
             fontSize: 13.5,
