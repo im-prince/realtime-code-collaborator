@@ -3,6 +3,9 @@ import ThemeToggle from './components/ThemeToggle.jsx';
 import TopNav from './components/TopNav.jsx';
 import Landing from './pages/Landing.jsx';
 import CreateRoom from './pages/CreateRoom.jsx';
+import Auth from './pages/Auth.jsx';
+import Dashboard from './pages/Dashboard.jsx';
+import EditorRoom from './pages/EditorRoom.jsx';
 
 function Soon({ name }) {
   return (
@@ -21,11 +24,13 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/new" element={<CreateRoom />} />
-        <Route path="/signup" element={<Soon name="signup" />} />
-        <Route path="/signin" element={<Soon name="signin" />} />
+        <Route path="/signup" element={<Auth mode="signup" />} />
+        <Route path="/signin" element={<Auth mode="signin" />} />
+        <Route path="/rooms" element={<Dashboard />} />
+        <Route path="/room/:roomId" element={<EditorRoom />} />
         <Route path="/new" element={<Soon name="new room" />} />
         <Route path="/rooms" element={<Soon name="my rooms" />} />
-        <Route path="/room/:roomId" element={<Soon name="editor" />} />
+
         <Route path="/closed" element={<Soon name="room closed" />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
