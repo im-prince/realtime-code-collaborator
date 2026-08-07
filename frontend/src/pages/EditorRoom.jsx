@@ -5,6 +5,9 @@ import { useTheme } from '../lib/useTheme.js';
 import { registerThemes } from '../lib/editorTheme.js';
 import { getRoom, shortId } from '../lib/api.js';
 import ThemeToggle from '../components/ThemeToggle.jsx';
+import { useCollab } from '../lib/useCollab.js';
+import RoomLoading from '../components/RoomLoading.jsx';
+import ParticipantsRail from '../components/ParticipantsRail.jsx';
 
 export default function EditorRoom() {
   const { roomId } = useParams();
@@ -13,9 +16,13 @@ export default function EditorRoom() {
   const editor = useRef(null);
   const monaco = useRef(null);
 
+
   const [room, setRoom] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [editorReady, setEditorReady] = useState(null);
+  const { status, peers } = useCollab(roomId, editorReady, 'Prince', room?.isCreator ?? false);
 
+  
   useEffect(() => {
     getRoom(roomId)
       .then(setRoom)
@@ -31,6 +38,7 @@ export default function EditorRoom() {
   function onEditorReady(instance, monacoApi) {
     editor.current = instance;
     monaco.current = monacoApi;
+    setEditorReady(instance);
 
     registerThemes(monacoApi);
     monacoApi.editor.setTheme(theme === 'light' ? 'collab-light' : 'collab-dark');
@@ -42,7 +50,7 @@ export default function EditorRoom() {
   }, [theme]);
 
   if (!room) {
-    return <div className="h-screen" style={{ background: 'var(--ed)' }} />;
+    return <RoomLoading />;
   }
 
   return (
@@ -66,16 +74,18 @@ export default function EditorRoom() {
         </button>
 
         <div className="ml-auto flex shrink-0 items-center gap-3">
-          <span className="flex items-center gap-1.5 text-xs text-[var(--tx3)]">
-            <span className="h-1.5 w-1.5 rounded-full bg-[var(--tx3)]" />
-            Offline
+          <span className="flex items-center gap-1.5 text-xs" style={{ color: status === 'connected' ? 'var(--ok)' : 'var(--accent)' }}>
+            <span className="h-1.5 w-1.5 rounded-full" style={{ background: 'currentColor' }} />
+            {status === 'connected' ? 'Connected' : 'Reconnecting'}
+            {peers.length > 1 && <span className="text-[var(--tx3)]"> · {peers.length}</span>}
           </span>
           <ThemeToggle />
         </div>
       </div>
 
-      <div className="min-h-0 flex-1">
-        <Editor
+     <div className="flex min-h-0 flex-1">
+        <div className="min-w-0 flex-1">
+          <Editor
           height="100%"
           language={room.language}
           onMount={onEditorReady}
@@ -89,6 +99,9 @@ export default function EditorRoom() {
             padding: { top: 12 },
           }}
         />
+        </div>
+
+        <ParticipantsRail peers={peers} roomId={roomId} createdAt={room.createdAt} />
       </div>
 
       <div className="flex h-[26px] shrink-0 items-center gap-4 border-t border-[var(--border)] bg-[var(--solid)] px-3 font-mono text-[11px] text-[var(--tx3)]">
