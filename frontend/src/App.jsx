@@ -7,6 +7,7 @@ import Auth from './pages/Auth.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import EditorRoom from './pages/EditorRoom.jsx';
 import RoomLoading from './components/RoomLoading.jsx';
+import RoomClosed from './pages/RoomClosed.jsx';
 
 function Soon({ name }) {
   return (
@@ -33,7 +34,7 @@ export default function App() {
         <Route path="/new" element={<Soon name="new room" />} />
         <Route path="/rooms" element={<Soon name="my rooms" />} />
 
-        <Route path="/closed" element={<Soon name="room closed" />} />
+        <Route path="/closed" element={<RoomClosed />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>
