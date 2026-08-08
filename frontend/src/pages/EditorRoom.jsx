@@ -1,28 +1,30 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
-import { useTheme } from '../lib/useTheme.js';
-import { registerThemes } from '../lib/editorTheme.js';
 import { getRoom, shortId } from '../lib/api.js';
 import ThemeToggle from '../components/ThemeToggle.jsx';
-import { useCollab } from '../lib/useCollab.js';
-import RoomLoading from '../components/RoomLoading.jsx';
 import ParticipantsRail from '../components/ParticipantsRail.jsx';
+import RoomLoading from '../components/RoomLoading.jsx';
+import AskName from '../components/AskName.jsx';
+import { useTheme } from '../lib/useTheme.js';
+import { useCollab } from '../lib/useCollab.js';
+import { registerThemes } from '../lib/editorTheme.js';
 
 export default function EditorRoom() {
   const { roomId } = useParams();
   const navigate = useNavigate();
   const theme = useTheme();
+
   const editor = useRef(null);
   const monaco = useRef(null);
-
 
   const [room, setRoom] = useState(null);
   const [copied, setCopied] = useState(false);
   const [editorReady, setEditorReady] = useState(null);
-  const { status, peers } = useCollab(roomId, editorReady, 'Prince', room?.isCreator ?? false);
+  const [myName, setMyName] = useState(() => localStorage.getItem('name'));
 
-  
+  const { status, peers } = useCollab(roomId, editorReady, myName, room?.isCreator ?? false);
+
   useEffect(() => {
     getRoom(roomId)
       .then(setRoom)
@@ -53,6 +55,10 @@ export default function EditorRoom() {
     return <RoomLoading />;
   }
 
+  if (!myName) {
+    return <AskName roomName={room.name} onDone={setMyName} />;
+  }
+
   return (
     <div className="flex h-screen flex-col">
       <div className="flex h-[46px] shrink-0 items-center gap-3 border-b border-[var(--border)] bg-[var(--solid)] px-3">
@@ -74,31 +80,33 @@ export default function EditorRoom() {
         </button>
 
         <div className="ml-auto flex shrink-0 items-center gap-3">
-          <span className="flex items-center gap-1.5 text-xs" style={{ color: status === 'connected' ? 'var(--ok)' : 'var(--accent)' }}>
+          <span
+            className="flex items-center gap-1.5 text-xs"
+            style={{ color: status === 'connected' ? 'var(--ok)' : 'var(--accent)' }}
+          >
             <span className="h-1.5 w-1.5 rounded-full" style={{ background: 'currentColor' }} />
             {status === 'connected' ? 'Connected' : 'Reconnecting'}
-            {peers.length > 1 && <span className="text-[var(--tx3)]"> · {peers.length}</span>}
           </span>
           <ThemeToggle />
         </div>
       </div>
 
-     <div className="flex min-h-0 flex-1">
+      <div className="flex min-h-0 flex-1">
         <div className="min-w-0 flex-1">
           <Editor
-          height="100%"
-          language={room.language}
-          onMount={onEditorReady}
-          options={{
-            fontFamily: 'JetBrains Mono',
-            fontSize: 13.5,
-            lineHeight: 24,
-            minimap: { enabled: false },
-            scrollBeyondLastLine: false,
-            tabSize: 4,
-            padding: { top: 12 },
-          }}
-        />
+            height="100%"
+            language={room.language}
+            onMount={onEditorReady}
+            options={{
+              fontFamily: 'JetBrains Mono',
+              fontSize: 13.5,
+              lineHeight: 24,
+              minimap: { enabled: false },
+              scrollBeyondLastLine: false,
+              tabSize: 4,
+              padding: { top: 12 },
+            }}
+          />
         </div>
 
         <ParticipantsRail peers={peers} roomId={roomId} createdAt={room.createdAt} />
