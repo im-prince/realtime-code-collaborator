@@ -9,6 +9,7 @@ import AskName from '../components/AskName.jsx';
 import { useTheme } from '../lib/useTheme.js';
 import { useCollab } from '../lib/useCollab.js';
 import { registerThemes } from '../lib/editorTheme.js';
+import { useSnapshot } from '../lib/useSnapshot.js';
 
 export default function EditorRoom() {
   const { roomId } = useParams();
@@ -23,7 +24,9 @@ export default function EditorRoom() {
   const [editorReady, setEditorReady] = useState(null);
   const [myName, setMyName] = useState(() => localStorage.getItem('name'));
 
-  const { status, peers } = useCollab(roomId, editorReady, myName, room?.isCreator ?? false);
+  const { status, peers, doc } = useCollab(roomId, editorReady, myName, room?.isCreator ?? false);
+
+  useSnapshot(roomId, doc, status === 'connected');
 
   useEffect(() => {
     getRoom(roomId)
