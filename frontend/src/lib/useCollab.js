@@ -32,12 +32,17 @@ export function useCollab(roomId, editor, name, isCreator) {
       });
 
       function readPeers() {
-        const everyone = [...provider.awareness.getStates().entries()];
+        const everyone = [...provider.awareness.getStates().entries()]
+          .filter(([, state]) => state.user)
+          .sort((a, b) => a[0] - b[0]);
 
         setPeers(
-          everyone
-            .filter(([, state]) => state.user)
-            .map(([id, state]) => ({ id, isMe: id === doc.clientID, ...state.user }))
+          everyone.map(([id, state], i) => ({
+            ...state.user,
+            id,
+            isMe: id === doc.clientID,
+            color: colors[i % colors.length],
+          }))
         );
       }
 
@@ -47,7 +52,6 @@ export function useCollab(roomId, editor, name, isCreator) {
         name,
         isCreator,
         isGuest: !getToken(),
-        color: colors[doc.clientID % colors.length],
       });
 
       readPeers();

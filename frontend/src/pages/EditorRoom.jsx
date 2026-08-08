@@ -25,15 +25,23 @@ export default function EditorRoom() {
   const [copied, setCopied] = useState(false);
   const [editorReady, setEditorReady] = useState(null);
   const [myName, setMyName] = useState(() => localStorage.getItem('name'));
+  const [spot, setSpot] = useState({ line: 1, col: 1 });
+  const [now, setNow] = useState(Date.now());
 
   const { status, peers, doc } = useCollab(roomId, editorReady, myName, room?.isCreator ?? false);
 
-  useSnapshot(roomId, doc, status === 'connected');
+  const savedAt = useSnapshot(roomId, doc, status === 'connected');
 
   const canEdit = room ? room.guestsCanEdit || room.isCreator : true;
+
   useEffect(() => {
     paintPeers(peers);
   }, [peers]);
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 5000);
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     getRoom(roomId)
@@ -65,6 +73,10 @@ export default function EditorRoom() {
 
     registerThemes(monacoApi);
     monacoApi.editor.setTheme(theme === 'light' ? 'collab-light' : 'collab-dark');
+
+    instance.onDidChangeCursorPosition((e) => {
+      setSpot({ line: e.position.lineNumber, col: e.position.column });
+    });
   }
 
   useEffect(() => {
@@ -153,9 +165,14 @@ export default function EditorRoom() {
       </div>
 
       <div className="flex h-[26px] shrink-0 items-center gap-4 border-t border-[var(--border)] bg-[var(--solid)] px-3 font-mono text-[11px] text-[var(--tx3)]">
+        <span>Ln {spot.line}, Col {spot.col}</span>
         <span>Spaces: 4</span>
         <span>UTF-8</span>
         <span>{room.language}</span>
+
+        {savedAt && (
+          <span className="ml-auto">snapshot saved {Math.round((now - savedAt) / 1000)}s ago</span>
+        )}
       </div>
     </div>
   );

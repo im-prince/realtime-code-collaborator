@@ -13,6 +13,10 @@ export function clearToken() {
   localStorage.removeItem('token');
 }
 
+export function shortId(roomId) {
+  return roomId.slice(0, 8);
+}
+
 async function readError(res) {
   let message = `Request failed (${res.status})`;
 
@@ -28,6 +32,11 @@ async function readError(res) {
   return err;
 }
 
+function bounceToSignin() {
+  clearToken();
+  location.href = '/signin';
+}
+
 async function request(path, options = {}) {
   const token = getToken();
   const headers = { ...options.headers };
@@ -35,18 +44,17 @@ async function request(path, options = {}) {
   if (options.body) headers['Content-Type'] = 'application/json';
   if (token) headers.Authorization = `Bearer ${token}`;
 
-  const res = await fetch(BASE + path, { ...options, headers });
+  let res;
 
-  if (res.status === 401 && getToken()) {
-    clearToken();
-    location.href = '/signin';
-    return;
+  try {
+    res = await fetch(BASE + path, { ...options, headers });
+  } catch {
+    throw new Error("Can't reach the server. Is it running?");
   }
 
-  if ((res.status === 401 || res.status === 403) && getToken()) {
-    clearToken();
-    location.href = '/signin';
-    return;
+  if ((res.status === 401 || res.status === 403) && token) {
+    bounceToSignin();
+    return null;
   }
 
   if (!res.ok) throw await readError(res);
@@ -87,11 +95,6 @@ export function getMyRooms() {
 export function deleteRoom(roomId) {
   return request(`/api/v1/rooms/${roomId}`, { method: 'DELETE' });
 }
-
-export function shortId(roomId) {
-  return roomId.slice(0, 8);
-}
-
 
 export async function getSnapshot(roomId) {
   const res = await fetch(`${BASE}/api/v1/rooms/${roomId}/snapshot`);
