@@ -25,7 +25,7 @@ public class RoomService {
         Room room = new Room();
         room.setName(name);
         room.setLanguage(language);
-        room.setGuestsCanEdit(guestsCanEdit);
+        room.setGuestsCanEdit(creatorId == null || guestsCanEdit);
 
         if (creatorId != null) {
             userRepository.findById(creatorId).ifPresent(room::setCreatedBy);
