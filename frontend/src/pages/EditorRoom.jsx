@@ -11,6 +11,7 @@ import { useTheme } from '../lib/useTheme.js';
 import { useCollab } from '../lib/useCollab.js';
 import { useSnapshot } from '../lib/useSnapshot.js';
 import { registerThemes } from '../lib/editorTheme.js';
+import { paintPeers } from '../lib/peerStyles.js';
 
 export default function EditorRoom() {
   const { roomId } = useParams();
@@ -30,6 +31,9 @@ export default function EditorRoom() {
   useSnapshot(roomId, doc, status === 'connected');
 
   const canEdit = room ? room.guestsCanEdit || room.isCreator : true;
+  useEffect(() => {
+    paintPeers(peers);
+  }, [peers]);
 
   useEffect(() => {
     getRoom(roomId)

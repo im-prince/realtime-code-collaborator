@@ -114,6 +114,34 @@ h1, h2, h3 {
   }
 }
 
+.yRemoteSelection {
+  background-color: var(--peer, rgba(34,211,238,.16));
+}
+
+.yRemoteSelectionHead {
+  position: relative;
+  border-left: 2px solid var(--peer, #22D3EE);
+  border-top: 2px solid var(--peer, #22D3EE);
+  border-bottom: 2px solid var(--peer, #22D3EE);
+  box-sizing: border-box;
+}
+
+.yRemoteSelectionHead::after {
+  content: attr(data-name);
+  position: absolute;
+  top: -18px;
+  left: -2px;
+  padding: 2px 7px;
+  border-radius: 5px;
+  background: var(--peer, #22D3EE);
+  color: var(--peerInk, #04202A);
+  font: 700 11px Figtree, sans-serif;
+  line-height: 16px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 5;
+}
+
 
 @keyframes flt {
   0%, 100% { transform: translate3d(0, 0, 0); }
