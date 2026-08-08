@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as Y from 'yjs';
 import { saveSnapshot } from './api.js';
 
@@ -7,6 +7,7 @@ const EVERY = 10000;
 export function useSnapshot(roomId, doc, connected) {
   const dirty = useRef(false);
   const saving = useRef(false);
+  const [savedAt, setSavedAt] = useState(null);
 
   useEffect(() => {
     if (!doc || !connected) return;
@@ -23,6 +24,7 @@ export function useSnapshot(roomId, doc, connected) {
 
       try {
         await saveSnapshot(roomId, Y.encodeStateAsUpdate(doc));
+        setSavedAt(Date.now());
       } catch {
         dirty.current = true;
       } finally {
@@ -39,4 +41,6 @@ export function useSnapshot(roomId, doc, connected) {
       save();
     };
   }, [roomId, doc, connected]);
+
+  return savedAt;
 }

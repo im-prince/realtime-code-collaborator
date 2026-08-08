@@ -115,7 +115,7 @@ h1, h2, h3 {
 }
 
 .yRemoteSelection {
-  background-color: var(--peer, rgba(34,211,238,.16));
+  background-color: color-mix(in oklab, var(--peer, #22D3EE) 16%, transparent);
 }
 
 .yRemoteSelectionHead {
