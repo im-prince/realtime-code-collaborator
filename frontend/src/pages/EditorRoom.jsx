@@ -1,15 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
-import { getRoom, shortId } from '../lib/api.js';
+import { getRoom, deleteRoom, shortId } from '../lib/api.js';
 import ThemeToggle from '../components/ThemeToggle.jsx';
 import ParticipantsRail from '../components/ParticipantsRail.jsx';
 import RoomLoading from '../components/RoomLoading.jsx';
 import AskName from '../components/AskName.jsx';
 import { useTheme } from '../lib/useTheme.js';
 import { useCollab } from '../lib/useCollab.js';
-import { registerThemes } from '../lib/editorTheme.js';
 import { useSnapshot } from '../lib/useSnapshot.js';
+import { registerThemes } from '../lib/editorTheme.js';
+import ReconnectToast from '../components/ReconnectToast.jsx';
 
 export default function EditorRoom() {
   const { roomId } = useParams();
@@ -38,6 +39,17 @@ export default function EditorRoom() {
     await navigator.clipboard.writeText(`${location.origin}/room/${roomId}`);
     setCopied(true);
     setTimeout(() => setCopied(false), 1600);
+  }
+
+  async function removeRoom() {
+    if (!confirm('Delete this room? Everyone gets kicked out and the snapshot goes too.')) return;
+
+    try {
+      await deleteRoom(roomId);
+      navigate('/rooms');
+    } catch (err) {
+      alert(err.message);
+    }
   }
 
   function onEditorReady(instance, monacoApi) {
@@ -90,12 +102,22 @@ export default function EditorRoom() {
             <span className="h-1.5 w-1.5 rounded-full" style={{ background: 'currentColor' }} />
             {status === 'connected' ? 'Connected' : 'Reconnecting'}
           </span>
+
+          {room.isCreator && (
+            <button
+              onClick={removeRoom}
+              className="rounded border border-[var(--dangerLine)] px-2.5 py-1 text-xs text-[var(--danger)] hover:bg-[var(--dangerFill)]"
+            >
+              Delete room
+            </button>
+          )}
+
           <ThemeToggle />
         </div>
       </div>
 
       <div className="flex min-h-0 flex-1">
-        <div className="min-w-0 flex-1">
+        <div className="relative min-w-0 flex-1">
           <Editor
             height="100%"
             language={room.language}
@@ -108,8 +130,11 @@ export default function EditorRoom() {
               scrollBeyondLastLine: false,
               tabSize: 4,
               padding: { top: 12 },
+              
             }}
+            
           />
+          {status !== 'connected' && <ReconnectToast />}
         </div>
 
         <ParticipantsRail peers={peers} roomId={roomId} createdAt={room.createdAt} />

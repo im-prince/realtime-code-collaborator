@@ -31,12 +31,26 @@ export function useCollab(roomId, editor, name, isCreator) {
         params: { name },
       });
 
+      function readPeers() {
+        const everyone = [...provider.awareness.getStates().entries()];
+
+        setPeers(
+          everyone
+            .filter(([, state]) => state.user)
+            .map(([id, state]) => ({ id, isMe: id === doc.clientID, ...state.user }))
+        );
+      }
+
+      provider.awareness.on('change', readPeers);
+
       provider.awareness.setLocalStateField('user', {
         name,
         isCreator,
         isGuest: !getToken(),
         color: colors[doc.clientID % colors.length],
       });
+
+      readPeers();
 
       binding = new MonacoBinding(
         doc.getText('monaco'),
@@ -47,16 +61,6 @@ export function useCollab(roomId, editor, name, isCreator) {
 
       provider.on('status', (e) => {
         setStatus(e.status === 'connected' ? 'connected' : 'reconnecting');
-      });
-
-      provider.awareness.on('change', () => {
-        const everyone = [...provider.awareness.getStates().entries()];
-
-        setPeers(
-          everyone
-            .filter(([, state]) => state.user)
-            .map(([id, state]) => ({ id, isMe: id === doc.clientID, ...state.user }))
-        );
       });
 
       setStatus('reconnecting');
