@@ -1,6 +1,7 @@
 const BASE = import.meta.env.VITE_API_URL;
 
 export function saveToken(token) {
+  if (!token) throw new Error('No token in the auth response');
   localStorage.setItem('token', token);
 }
 
@@ -35,6 +36,18 @@ async function request(path, options = {}) {
   if (token) headers.Authorization = `Bearer ${token}`;
 
   const res = await fetch(BASE + path, { ...options, headers });
+
+  if (res.status === 401 && getToken()) {
+    clearToken();
+    location.href = '/signin';
+    return;
+  }
+
+  if ((res.status === 401 || res.status === 403) && getToken()) {
+    clearToken();
+    location.href = '/signin';
+    return;
+  }
 
   if (!res.ok) throw await readError(res);
   if (res.status === 204) return null;

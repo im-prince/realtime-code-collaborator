@@ -22,7 +22,7 @@ export default function Auth({ mode }) {
         ? await signup(username.trim(), email.trim(), password)
         : await login(email.trim(), password);
 
-      saveToken(res.token);
+      saveToken(res.accessToken);
       navigate('/rooms');
     } catch (err) {
       setError(err.message);
