@@ -6,11 +6,11 @@ import ThemeToggle from '../components/ThemeToggle.jsx';
 import ParticipantsRail from '../components/ParticipantsRail.jsx';
 import RoomLoading from '../components/RoomLoading.jsx';
 import AskName from '../components/AskName.jsx';
+import ReconnectToast from '../components/ReconnectToast.jsx';
 import { useTheme } from '../lib/useTheme.js';
 import { useCollab } from '../lib/useCollab.js';
 import { useSnapshot } from '../lib/useSnapshot.js';
 import { registerThemes } from '../lib/editorTheme.js';
-import ReconnectToast from '../components/ReconnectToast.jsx';
 
 export default function EditorRoom() {
   const { roomId } = useParams();
@@ -28,6 +28,8 @@ export default function EditorRoom() {
   const { status, peers, doc } = useCollab(roomId, editorReady, myName, room?.isCreator ?? false);
 
   useSnapshot(roomId, doc, status === 'connected');
+
+  const canEdit = room ? room.guestsCanEdit || room.isCreator : true;
 
   useEffect(() => {
     getRoom(roomId)
@@ -94,6 +96,12 @@ export default function EditorRoom() {
           {copied ? 'Copied' : `Copy ${shortId(roomId)}`}
         </button>
 
+        {!canEdit && (
+          <span className="shrink-0 rounded border border-[var(--border)] px-2 py-0.5 text-xs text-[var(--tx3)]">
+            Read only
+          </span>
+        )}
+
         <div className="ml-auto flex shrink-0 items-center gap-3">
           <span
             className="flex items-center gap-1.5 text-xs"
@@ -130,10 +138,10 @@ export default function EditorRoom() {
               scrollBeyondLastLine: false,
               tabSize: 4,
               padding: { top: 12 },
-              
+              readOnly: !canEdit,
             }}
-            
           />
+
           {status !== 'connected' && <ReconnectToast />}
         </div>
 

@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard.jsx';
 import EditorRoom from './pages/EditorRoom.jsx';
 import RoomLoading from './components/RoomLoading.jsx';
 import RoomClosed from './pages/RoomClosed.jsx';
+import RequireAuth from './components/RequireAuth.jsx';
 
 function Soon({ name }) {
   return (
@@ -28,7 +29,14 @@ export default function App() {
         <Route path="/new" element={<CreateRoom />} />
         <Route path="/signup" element={<Auth mode="signup" />} />
         <Route path="/signin" element={<Auth mode="signin" />} />
-        <Route path="/rooms" element={<Dashboard />} />
+        <Route
+          path="/rooms"
+          element={
+            <RequireAuth>
+              <Dashboard />
+            </RequireAuth>
+          }
+        />
         <Route path="/room/:roomId" element={<EditorRoom />} />
         <Route path="/loading-test" element={<RoomLoading />} />
         <Route path="/new" element={<Soon name="new room" />} />
