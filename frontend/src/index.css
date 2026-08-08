@@ -170,6 +170,11 @@ h1, h2, h3 {
   animation: shimmer 1.5s linear infinite;
 }
 
+.chip-on {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: color-mix(in oklab, var(--accent) 12%, transparent);
+}
 
 .glass {
   background: color-mix(in oklab, var(--solid) 82%, transparent);

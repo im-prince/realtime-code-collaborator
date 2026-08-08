@@ -6,6 +6,7 @@ import CreateRoom from './pages/CreateRoom.jsx';
 import Auth from './pages/Auth.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import EditorRoom from './pages/EditorRoom.jsx';
+import RoomLoading from './components/RoomLoading.jsx';
 
 function Soon({ name }) {
   return (
@@ -28,6 +29,7 @@ export default function App() {
         <Route path="/signin" element={<Auth mode="signin" />} />
         <Route path="/rooms" element={<Dashboard />} />
         <Route path="/room/:roomId" element={<EditorRoom />} />
+        <Route path="/loading-test" element={<RoomLoading />} />
         <Route path="/new" element={<Soon name="new room" />} />
         <Route path="/rooms" element={<Soon name="my rooms" />} />
 
