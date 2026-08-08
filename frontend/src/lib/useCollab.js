@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as Y from 'yjs';
 import { WebsocketProvider } from 'y-websocket';
 import { MonacoBinding } from 'y-monaco';
@@ -11,10 +11,12 @@ const colors = ['#22D3EE', '#F472B6', '#A3E635', '#FBBF24', '#A78BFA', '#FB7185'
 export function useCollab(roomId, editor, name, isCreator) {
   const [status, setStatus] = useState('loading');
   const [peers, setPeers] = useState([]);
+  const docRef = useRef(null);
 
   useEffect(() => {
    if (!editor || !name) return;
     const doc = new Y.Doc();
+    docRef.current = doc;
     let provider = null;
     let binding = null;
     let stopped = false;
@@ -70,5 +72,5 @@ export function useCollab(roomId, editor, name, isCreator) {
     };
   }, [roomId, editor, name, isCreator]);
 
-  return { status, peers };
+  return { status, peers, doc:docRef.current };
 }
