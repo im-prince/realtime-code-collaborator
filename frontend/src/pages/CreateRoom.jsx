@@ -14,13 +14,15 @@ export default function CreateRoom() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
+  const editingOn = signedIn ? guestsCanEdit : true;
+
   async function submit(e) {
     e.preventDefault();
     setSaving(true);
     setError('');
 
     try {
-      const room = await createRoom(name.trim(), language.toLowerCase(), guestsCanEdit);
+      const room = await createRoom(name.trim(), language.toLowerCase(), editingOn);
       const link = `${location.origin}/room/${room.roomId}`;
 
       try {
@@ -37,18 +39,18 @@ export default function CreateRoom() {
   }
 
   return (
-    <div className="relative grid min-h-[calc(100vh-67px)] place-items-center px-6 py-">
+    <div className="relative grid min-h-[calc(100vh-67px)] place-items-center px-6 py-8">
       <div className="blob" style={{ '--blobTint': 'rgba(34,211,238,.10)', top: 40, left: '15%' }} />
 
       <div className="relative w-full max-w-[740px]">
-        <h1 className="text-center text-[40px] font-extrabold tracking-[-1.4px] text-[var(--tx)]">
+        <h1 className="text-center text-[32px] font-extrabold tracking-[-1.2px] text-[var(--tx)]">
           Set up the room
         </h1>
-        <p className="mt-3 text-center text-[var(--tx2)]">
+        <p className="mt-2 text-center text-sm text-[var(--tx2)]">
           Two settings, then you get a link to share.
         </p>
 
-        <form onSubmit={submit} className="glass mt-10 p-8">
+        <form onSubmit={submit} className="glass mt-6 p-7">
           <label className="block text-sm text-[var(--tx2)]">Room name</label>
           <input
             value={name}
@@ -81,22 +83,25 @@ export default function CreateRoom() {
             <div>
               <p className="font-semibold text-[var(--tx)]">Let guests edit</p>
               <p className="mt-1 text-sm text-[var(--tx3)]">
-                Off means they can watch and highlight only.
+                {signedIn
+                  ? 'Off means they can watch and highlight only.'
+                  : 'Guest rooms have no host, so editing stays on for everyone.'}
               </p>
             </div>
 
             <button
               type="button"
               role="switch"
-              aria-checked={guestsCanEdit}
+              aria-checked={editingOn}
+              disabled={!signedIn}
               onClick={() => setGuestsCanEdit(!guestsCanEdit)}
-              className={`h-8 w-14 shrink-0 rounded-full p-1 transition-colors ${
-                guestsCanEdit ? 'bg-[var(--accent)]' : 'bg-[var(--solid2)]'
+              className={`h-8 w-14 shrink-0 rounded-full p-1 transition-colors disabled:opacity-40 ${
+                editingOn ? 'bg-[var(--accent)]' : 'bg-[var(--solid2)]'
               }`}
             >
               <span
                 className={`block h-6 w-6 rounded-full bg-white transition-transform ${
-                  guestsCanEdit ? 'translate-x-6' : ''
+                  editingOn ? 'translate-x-6' : ''
                 }`}
               />
             </button>
