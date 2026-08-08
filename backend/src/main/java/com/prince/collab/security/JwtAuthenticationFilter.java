@@ -7,13 +7,13 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-
+@Slf4j
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -31,29 +31,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        if (header == null || !header.startsWith(BEARER_PREFIX)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        String token = header.substring(BEARER_PREFIX.length());
-
-        try {
-            Long userId = jwtService.extractUserId(token);
-            request.setAttribute(USER_ID_ATTRIBUTE, userId);
-        } catch (JwtException | IllegalArgumentException ex) {
-            writeUnauthorized(response);
-            return;
+        if (header != null && header.startsWith(BEARER_PREFIX)) {
+            String token = header.substring(BEARER_PREFIX.length());
+            try {
+                request.setAttribute(USER_ID_ATTRIBUTE, jwtService.extractUserId(token));
+            } catch (JwtException | IllegalArgumentException ex) {
+                log.debug("Ignoring unusable token: {}", ex.getMessage());
+            }
         }
 
         filterChain.doFilter(request, response);
     }
 
-    private void writeUnauthorized(HttpServletResponse response) throws IOException {
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.setContentType(MediaType.APPLICATION_PROBLEM_JSON_VALUE);
-        response.getWriter().write("""
-                {"title":"Unauthorized","status":401,"detail":"Invalid or expired token"}
-                """);
-    }
 }
