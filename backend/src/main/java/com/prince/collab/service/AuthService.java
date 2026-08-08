@@ -20,6 +20,10 @@ public class AuthService {
             throw new IllegalArgumentException("Email already registered");
         }
 
+        if (userRepository.existsByUsername(username)) {
+            throw new IllegalArgumentException("Username already taken");
+        }
+
         User user = new User();
         user.setUsername(username);
         user.setEmail(email);
