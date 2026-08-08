@@ -13,8 +13,7 @@ export function useCollab(roomId, editor, name, isCreator) {
   const [peers, setPeers] = useState([]);
 
   useEffect(() => {
-    if (!editor) return;
-
+   if (!editor || !name) return;
     const doc = new Y.Doc();
     let provider = null;
     let binding = null;
