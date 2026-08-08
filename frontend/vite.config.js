@@ -7,6 +7,14 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  resolve: {
+    alias: {
+      'monaco-editor/esm/vs/editor/editor.api.js': 'monaco-editor',
+    },
+  },
+  optimizeDeps: {
+    exclude: ['y-monaco'],
+  },
   server: {
     port: 5173,
     strictPort: true,
