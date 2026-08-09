@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
-import { getRoom, deleteRoom, shortId } from '../lib/api.js';
+import { getRoom, deleteRoom, shortId, getToken } from '../lib/api.js';
 import ThemeToggle from '../components/ThemeToggle.jsx';
 import ParticipantsRail from '../components/ParticipantsRail.jsx';
 import RoomLoading from '../components/RoomLoading.jsx';
@@ -20,17 +20,18 @@ export default function EditorRoom() {
 
   const editor = useRef(null);
   const monaco = useRef(null);
+  const typingTimer = useRef(null);
 
   const [room, setRoom] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [leaving, setLeaving] = useState(false);
   const [editorReady, setEditorReady] = useState(null);
   const [myName, setMyName] = useState(() => localStorage.getItem('name'));
   const [spot, setSpot] = useState({ line: 1, col: 1 });
   const [now, setNow] = useState(Date.now());
 
-  const { status, peers, doc } = useCollab(roomId, editorReady, myName, room?.isCreator ?? false);
-
-  const savedAt = useSnapshot(roomId, doc, status === 'connected');
+  const { status, peers, doc, publish } = useCollab(roomId, editorReady, myName, room?.isCreator ?? false);
+  const { savedAt, saveNow } = useSnapshot(roomId, doc, status === 'connected');
 
   const canEdit = room ? room.guestsCanEdit || room.isCreator : true;
 
@@ -55,6 +56,12 @@ export default function EditorRoom() {
     setTimeout(() => setCopied(false), 1600);
   }
 
+  async function leaveRoom() {
+    setLeaving(true);
+    await saveNow();
+    navigate(getToken() ? '/rooms' : '/');
+  }
+
   async function removeRoom() {
     if (!confirm('Delete this room? Everyone gets kicked out and the snapshot goes too.')) return;
 
@@ -76,6 +83,18 @@ export default function EditorRoom() {
 
     instance.onDidChangeCursorPosition((e) => {
       setSpot({ line: e.position.lineNumber, col: e.position.column });
+      publish({ line: e.position.lineNumber });
+    });
+
+    instance.onDidChangeCursorSelection((e) => {
+      if (!e.selection.isEmpty()) publish({ doing: 'selecting' });
+    });
+
+    instance.onKeyDown(() => {
+      publish({ doing: 'typing' });
+
+      clearTimeout(typingTimer.current);
+      typingTimer.current = setTimeout(() => publish({ doing: 'viewing' }), 2000);
     });
   }
 
@@ -126,6 +145,14 @@ export default function EditorRoom() {
             <span className="h-1.5 w-1.5 rounded-full" style={{ background: 'currentColor' }} />
             {status === 'connected' ? 'Connected' : 'Reconnecting'}
           </span>
+
+          <button
+            onClick={leaveRoom}
+            disabled={leaving}
+            className="rounded border border-[var(--border)] px-2.5 py-1 text-xs text-[var(--tx2)] hover:text-[var(--tx)] disabled:opacity-50"
+          >
+            {leaving ? 'Saving…' : 'Leave'}
+          </button>
 
           {room.isCreator && (
             <button

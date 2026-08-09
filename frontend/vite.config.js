@@ -15,6 +15,17 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['y-monaco'],
   },
+  build: {
+    chunkSizeWarningLimit: 1500,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          monaco: ['monaco-editor'],
+          yjs: ['yjs', 'y-websocket', 'y-monaco'],
+        },
+      },
+    },
+  },
   server: {
     port: 5173,
     strictPort: true,

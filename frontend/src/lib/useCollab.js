@@ -12,6 +12,7 @@ export function useCollab(roomId, editor, name, isCreator) {
   const [status, setStatus] = useState('loading');
   const [peers, setPeers] = useState([]);
   const docRef = useRef(null);
+  const awarenessRef = useRef(null);
 
   useEffect(() => {
    if (!editor || !name) return;
@@ -30,6 +31,8 @@ export function useCollab(roomId, editor, name, isCreator) {
       provider = new WebsocketProvider(`${WS}/ws`, roomId, doc, {
         params: { name },
       });
+
+      awarenessRef.current = provider.awareness;
 
       function readPeers() {
         const everyone = [...provider.awareness.getStates().entries()]
@@ -76,9 +79,18 @@ export function useCollab(roomId, editor, name, isCreator) {
       stopped = true;
       binding?.destroy();
       provider?.destroy();
+      awarenessRef.current = null;
       doc.destroy();
     };
   }, [roomId, editor, name, isCreator]);
 
-  return { status, peers, doc:docRef.current };
+ function publish(extra) {
+    const aw = awarenessRef.current;
+    if (!aw) return;
+
+    const current = aw.getLocalState()?.user || {};
+    aw.setLocalStateField('user', { ...current, ...extra });
+  }
+
+  return { status, peers, doc: docRef.current, publish };
 }
