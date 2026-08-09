@@ -7,6 +7,7 @@ const EVERY = 10000;
 export function useSnapshot(roomId, doc, connected) {
   const dirty = useRef(false);
   const saving = useRef(false);
+  const saveRef = useRef(null);
   const [savedAt, setSavedAt] = useState(null);
 
   useEffect(() => {
@@ -32,6 +33,7 @@ export function useSnapshot(roomId, doc, connected) {
       }
     }
 
+    saveRef.current = save;
     doc.on('update', markDirty);
     const timer = setInterval(save, EVERY);
 
@@ -39,8 +41,13 @@ export function useSnapshot(roomId, doc, connected) {
       clearInterval(timer);
       doc.off('update', markDirty);
       save();
+      saveRef.current = null;
     };
   }, [roomId, doc, connected]);
 
-  return savedAt;
+  function saveNow() {
+    return saveRef.current ? saveRef.current() : Promise.resolve();
+  }
+
+  return { savedAt, saveNow };
 }

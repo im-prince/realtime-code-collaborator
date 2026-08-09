@@ -46,11 +46,19 @@ export default function ParticipantsRail({ peers, roomId, createdAt }) {
               {initials(person.name)}
             </span>
 
-            <span className="min-w-0 flex-1 truncate text-sm text-[var(--tx)]">
-              {person.name}
-              {person.isMe && <span className="text-[var(--tx3)]"> (you)</span>}
-            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-sm text-[var(--tx)]">
+                {person.name}
+                {person.isMe && <span className="text-[var(--tx3)]"> (you)</span>}
+              </span>
 
+              {person.line && (
+                <span className="block truncate font-mono text-[11px] text-[var(--tx3)]">
+                  Ln {person.line}
+                  {person.doing && person.doing !== 'viewing' && ` · ${person.doing}`}
+                </span>
+              )}
+            </span>
             <span className="shrink-0 rounded bg-[var(--solid2)] px-1.5 py-0.5 font-mono text-[9px] text-[var(--tx3)]">
               {badgeFor(person)}
             </span>
