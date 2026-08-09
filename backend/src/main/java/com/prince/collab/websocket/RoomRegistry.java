@@ -1,5 +1,6 @@
 package com.prince.collab.websocket;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -9,6 +10,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+@Slf4j
 @Component
 public class RoomRegistry {
 
@@ -37,7 +39,7 @@ public class RoomRegistry {
             try {
                 s.sendMessage(new BinaryMessage(payload));
             } catch (IOException e) {
-                // one bad session shouldn't kill the whole broadcast loop — log and move on
+                log.warn("Failed to send to session {} in room {}", s.getId(), roomId, e);
             }
         }
     }
