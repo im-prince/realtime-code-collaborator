@@ -8,7 +8,6 @@ function initials(name) {
     .join('')
     .toUpperCase();
 }
-
 function badgeFor(person) {
   if (person.isCreator) return 'HOST';
   if (person.isGuest) return 'GUEST';
