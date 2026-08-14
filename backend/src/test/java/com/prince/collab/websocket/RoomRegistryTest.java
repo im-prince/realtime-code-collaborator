@@ -31,6 +31,9 @@ class RoomRegistryTest {
     }
 
 
+//     test for room isolation
+
+
     @Test
     void doesNotSendToPeopleInOtherRooms() throws IOException {
         // arrange
@@ -52,6 +55,7 @@ class RoomRegistryTest {
 
 
 
+//    test for no echo back to sender
 
 
     @Test
@@ -74,6 +78,8 @@ class RoomRegistryTest {
         verify(sender, never()).sendMessage(any(BinaryMessage.class));
     }
 
+
+//    test for one bad connection not blocking the room
 
     @Test
     void keepsSendingAfterOneConnectionFails() throws IOException {
