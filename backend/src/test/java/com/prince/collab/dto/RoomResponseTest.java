@@ -38,4 +38,42 @@ class RoomResponseTest {
         assertThat(response.createdAt()).isEqualTo(created);
         assertThat(response.lastActiveAt()).isEqualTo(lastActive);
     }
+
+    @Test
+    void marksTheOwnerAsCreator() {
+        User owner = new User();
+        owner.setId(7L);
+
+        Room room = new Room();
+        room.setCreatedBy(owner);
+
+        RoomResponse response = RoomResponse.from(room, 7L);
+
+        assertThat(response.isCreator()).isTrue();
+    }
+
+//    tests for the isCreator
+
+    @Test
+    void doesNotMarkADifferentUserAsCreator() {
+        User owner = new User();
+        owner.setId(7L);
+
+        Room room = new Room();
+        room.setCreatedBy(owner);
+
+        RoomResponse response = RoomResponse.from(room, 99L);
+
+        assertThat(response.isCreator()).isFalse();
+    }
+
+    @Test
+    void doesNotMarkAGuestAsCreatorOfAnOwnerlessRoom() {
+        Room room = new Room();
+        room.setCreatedBy(null);
+
+        RoomResponse response = RoomResponse.from(room, null);
+
+        assertThat(response.isCreator()).isFalse();
+    }
 }
